@@ -1,15 +1,12 @@
 package com.example.finalproject.entity;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class Role extends BaseEntity {
@@ -17,11 +14,9 @@ public class Role extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	private String roleName;
-
-	@OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
-	@JsonManagedReference
-	private List<User> users;
+	@Enumerated(EnumType.STRING)
+	@Column(length = 20)
+	private ERole roleName;
 
 	public Integer getId() {
 		return id;
@@ -31,25 +26,12 @@ public class Role extends BaseEntity {
 		this.id = id;
 	}
 
-	public String getRoleName() {
+	public ERole getRoleName() {
 		return roleName;
 	}
 
-	public void setRoleName(String roleName) {
+	public void setRoleName(ERole roleName) {
 		this.roleName = roleName;
-	}
-
-	public List<User> getUsers() {
-		return users;
-	}
-
-	public void setUsers(List<User> users) {
-		this.users = users;
-	}
-
-	@Override
-	public String toString() {
-		return "Role [id=" + id + ", roleName=" + roleName + ", users=" + users + "]";
 	}
 
 }

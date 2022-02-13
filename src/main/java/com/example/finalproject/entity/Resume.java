@@ -13,7 +13,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 
 @Entity
-public class Resume extends BaseEntity{
+public class Resume extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
@@ -27,6 +27,8 @@ public class Resume extends BaseEntity{
 	private List<Recruitment> recruiments;
 
 	private Integer candidateId;
+
+	private String content;
 
 	public Integer getId() {
 		return id;
@@ -66,6 +68,14 @@ public class Resume extends BaseEntity{
 
 	public void setCandidateId(Integer candidateId) {
 		this.candidateId = candidateId;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
 	}
 
 	@Override

@@ -8,5 +8,5 @@ import com.example.finalproject.entity.Company;
 // CRUD refers Create, Read, Update, Delete
 
 public interface CompanyRepository extends CrudRepository<Company, Integer> {
-
+	
 }

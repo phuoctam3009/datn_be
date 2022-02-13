@@ -41,6 +41,8 @@ public class Recruitment extends BaseEntity {
 
 	private String salary;
 
+	private String workExperience;
+
 	@ManyToOne
 	@JoinColumn(name = "career_id")
 	@JsonBackReference
@@ -48,12 +50,14 @@ public class Recruitment extends BaseEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "level_id")
-	@JsonBackReference
+//	@JsonBackReference
+	@JsonIgnoreProperties("recruitments")
 	private Level level;
 
 	@ManyToOne
 	@JoinColumn(name = "type_work_id")
-	@JsonBackReference
+//	@JsonBackReference
+	@JsonIgnoreProperties("recruitments")
 	private TypeWork typeWork;
 
 	private String address;
@@ -194,13 +198,22 @@ public class Recruitment extends BaseEntity {
 		this.ads_status = ads_status;
 	}
 
+	public String getWorkExperience() {
+		return workExperience;
+	}
+
+	public void setWorkExperience(String workExperience) {
+		this.workExperience = workExperience;
+	}
+
 	@Override
 	public String toString() {
 		return "Recruitment [id=" + id + ", company=" + company + ", jobTitle=" + jobTitle + ", amountEmployee="
 				+ amountEmployee + ", dateRecruitment=" + dateRecruitment + ", jobDescription=" + jobDescription
 				+ ", jobRequirements=" + jobRequirements + ", jobBenefits=" + jobBenefits + ", salary=" + salary
-				+ ", career=" + career + ", level=" + level + ", typeWork=" + typeWork + ", address=" + address
-				+ ", resumes=" + resumes + ", status=" + status + ", ads_status=" + ads_status + "]";
+				+ ", workExperience=" + workExperience + ", career=" + career + ", level=" + level + ", typeWork="
+				+ typeWork + ", address=" + address + ", resumes=" + resumes + ", status=" + status + ", ads_status="
+				+ ads_status + "]";
 	}
 
 }
