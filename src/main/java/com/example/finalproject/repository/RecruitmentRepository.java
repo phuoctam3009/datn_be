@@ -2,8 +2,10 @@ package com.example.finalproject.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -11,9 +13,9 @@ import com.example.finalproject.dto.RecruitmentDto;
 import com.example.finalproject.entity.Recruitment;
 
 @Repository
-public interface RecruitmentRepository extends PagingAndSortingRepository<Recruitment, Integer> {
+public interface RecruitmentRepository extends JpaRepository<Recruitment, Integer> {
 	@Query("SELECT r FROM Recruitment r")
-	public List<Recruitment> findAllItem();
+	public Page<Recruitment> findAllItem(Pageable pageable);
 
 	@Query(value = "SELECT r.id, r.job_title as jobTitle, datediff(r.date_recruitment, now()) as dateDiff, l.name_level as nameLevel, tw.name_type_work as nameTypeWork "
 			+ "FROM Recruitment r " + "join level l " + "on r.level_id = l.id " + "join type_work tw "
