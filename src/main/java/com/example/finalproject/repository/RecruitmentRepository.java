@@ -5,9 +5,11 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.finalproject.dto.RecruitmentDto;
 import com.example.finalproject.entity.Recruitment;
@@ -29,4 +31,9 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
 			+ "on r.type_work_id = tw.id " + "join company c on r.company_id = c.id "
 			+ "where r.career_id = :#{#recruitment.career.id} and r.id != :#{#recruitment.id} and datediff(r.date_recruitment, now()) > 0 limit 5", nativeQuery = true)
 	public List<RecruitmentDto> getRecruitmentsReference(@Param("recruitment") Recruitment recruitment);
+
+	@Modifying
+	@Transactional
+	@Query("UPDATE Recruitment m SET m.isActive = ?2 WHERE m.id = ?1")
+	public int updateStatus(Integer recruitmentId, boolean active);
 }

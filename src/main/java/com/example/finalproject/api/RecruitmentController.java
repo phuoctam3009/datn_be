@@ -9,10 +9,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -56,7 +59,6 @@ public class RecruitmentController {
 
 	@GetMapping("/reference/recruitment/{recruitmentId}")
 	public ResponseEntity getRecruitmentsReference(@PathVariable(name = "recruitmentId") Integer recruitmentId) {
-		System.out.println("recruitment11: " + recruitmentId);
 		if (recruitmentId == null || recruitmentId <= 0) {
 			return null;
 		}
@@ -66,6 +68,16 @@ public class RecruitmentController {
 		}
 		List<RecruitmentDto> recruitmentsReference = recruitmentRepository.getRecruitmentsReference(recruitment);
 		return ResponseEntity.ok(recruitmentsReference);
+	}
+
+	@PutMapping("/status")
+	public ResponseEntity updateStatusRecruitment(@RequestParam(value = "status", required = true) boolean status,
+			@RequestParam(value = "id", required = true) int id) {
+		System.out.println(status);
+		System.out.println(id);
+		recruitmentRepository.updateStatus(id, status);
+		return ResponseEntity.ok(null);
+
 	}
 
 }

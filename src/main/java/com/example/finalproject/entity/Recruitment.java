@@ -70,6 +70,8 @@ public class Recruitment extends BaseEntity {
 
 	private String ads_status;
 
+	private boolean isActive;
+
 	public Integer getId() {
 		return id;
 	}
@@ -204,6 +206,14 @@ public class Recruitment extends BaseEntity {
 
 	public void setWorkExperience(String workExperience) {
 		this.workExperience = workExperience;
+	}
+
+	public boolean isActive() {
+		return isActive;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 
 	@Override
