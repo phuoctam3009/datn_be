@@ -11,8 +11,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class Company extends BaseEntity {
@@ -20,8 +22,9 @@ public class Company extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	@OneToOne
+	@OneToOne(cascade=CascadeType.ALL)
 	@JoinColumn(name = "user_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private User user;
 
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
@@ -45,7 +48,7 @@ public class Company extends BaseEntity {
 
 	private String description;
 
-	private String status;
+	private boolean isActive;
 
 	public Integer getId() {
 		return id;
@@ -98,7 +101,7 @@ public class Company extends BaseEntity {
 	public String getAddress() {
 		return address;
 	}
- 
+
 	public void setAddress(String address) {
 		this.address = address;
 	}
@@ -135,20 +138,20 @@ public class Company extends BaseEntity {
 		this.description = description;
 	}
 
-	public String getStatus() {
-		return status;
+	public boolean isActive() {
+		return isActive;
 	}
 
-	public void setStatus(String status) {
-		this.status = status;
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 
 	@Override
 	public String toString() {
 		return "Company [id=" + id + ", user=" + user + ", recruitments=" + recruitments + ", contact=" + contact
 				+ ", companyName=" + companyName + ", phone=" + phone + ", address=" + address + ", website=" + website
-				+ ", avatar=" + avatar + ", background=" + background + ", description=" + description + ", status="
-				+ status + "]";
+				+ ", avatar=" + avatar + ", background=" + background + ", description=" + description + ", isActive="
+				+ isActive + "]";
 	}
 
 }

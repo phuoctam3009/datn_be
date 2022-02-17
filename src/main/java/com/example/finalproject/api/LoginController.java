@@ -64,10 +64,10 @@ public class LoginController {
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-			return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+			return ResponseEntity.badRequest().body(new MessageResponse("Tên đăng nhập đã tồn tại!"));
 		}
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-			return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!"));
+			return ResponseEntity.badRequest().body(new MessageResponse("Email đã tồn tại!"));
 		}
 		// Create new user's account
 		User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
@@ -76,24 +76,22 @@ public class LoginController {
 		Set<Role> roles = new HashSet<>();
 		if (strRoles == null) {
 			Role userRole = roleRepository.findByRoleName(ERole.ROLE_CANDIDATE)
-					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+					.orElseThrow(() -> new RuntimeException("Không tìm thấy role"));
 			roles.add(userRole);
 		} else {
 			for (String role : strRoles) {
 				switch (role) {
-				case "admin":
+				case "ROLE_ADMIN":
 					Role adminRole = roleRepository.findByRoleName(ERole.ROLE_ADMIN)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+							.orElseThrow(() -> new RuntimeException("Không tìm thấy role"));
 					roles.add(adminRole);
-					break;
-				case "employee":
+				case "ROLE_EMPLOYEE":
 					Role modRole = roleRepository.findByRoleName(ERole.ROLE_EMPLOYEE)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+							.orElseThrow(() -> new RuntimeException("Không tìm thấy role"));
 					roles.add(modRole);
-					break;
 				default:
 					Role userRole = roleRepository.findByRoleName(ERole.ROLE_CANDIDATE)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+							.orElseThrow(() -> new RuntimeException("Không tìm thấy role"));
 					roles.add(userRole);
 				}
 			}
@@ -119,6 +117,6 @@ public class LoginController {
 		}
 		user.setRoles(roles);
 		userRepository.save(user);
-		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+		return ResponseEntity.ok(new MessageResponse("Đăng ký tài khoản thành công!"));
 	}
 }

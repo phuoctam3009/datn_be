@@ -73,10 +73,8 @@ public class RecruitmentController {
 	@PutMapping("/status")
 	public ResponseEntity updateStatusRecruitment(@RequestParam(value = "status", required = true) boolean status,
 			@RequestParam(value = "id", required = true) int id) {
-		System.out.println(status);
-		System.out.println(id);
 		recruitmentRepository.updateStatus(id, status);
-		return ResponseEntity.ok(null);
+		return ResponseEntity.ok("Update trạng thái thành công");
 
 	}
 

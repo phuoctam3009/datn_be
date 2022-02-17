@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,5 +33,13 @@ public class CompanyController {
 			@RequestParam(value = "size", required = true) int size) {
 		Page<Company> findAllItem = companyRepository.findAllItem(PageRequest.of(page - 1, size));
 		return ResponseEntity.ok(findAllItem);
+	}
+
+	@PutMapping("/status")
+	public ResponseEntity updateStatusCompany(@RequestParam(value = "status", required = true) boolean status,
+			@RequestParam(value = "id", required = true) int id) {
+		companyRepository.updateStatus(id, status);
+		return ResponseEntity.ok("Update trạng thái thành công");
+
 	}
 }

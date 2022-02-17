@@ -17,6 +17,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "user", uniqueConstraints = { @UniqueConstraint(columnNames = "username"),
 		@UniqueConstraint(columnNames = "email") })
@@ -33,6 +35,7 @@ public class User extends BaseEntity {
 	private String email;
 	@NotBlank
 	@Size(max = 120)
+	@JsonIgnore
 	private String password;
 	@Size(max = 20)
 	private String phone;
