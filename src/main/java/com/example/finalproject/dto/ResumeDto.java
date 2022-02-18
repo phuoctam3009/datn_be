@@ -1,11 +1,15 @@
 package com.example.finalproject.dto;
 
+import java.io.File;
+
 public class ResumeDto {
 	private String userId;
 
 	private String data;
 
 	private String title;
+
+	private File file;
 
 	public String getUserId() {
 		return userId;
@@ -29,6 +33,14 @@ public class ResumeDto {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 
 }

@@ -9,7 +9,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 @Entity
+@SQLDelete(sql = "UPDATE Candidate SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
 public class Candidate extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +39,8 @@ public class Candidate extends BaseEntity {
 	private Date birthday;
 
 	private String status;
+
+	private boolean deleted = Boolean.FALSE;
 
 	public Integer getId() {
 		return id;
@@ -113,6 +120,14 @@ public class Candidate extends BaseEntity {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	@Override

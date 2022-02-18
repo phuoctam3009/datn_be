@@ -15,7 +15,7 @@ import com.example.finalproject.entity.Recruitment;
 // CRUD refers Create, Read, Update, Delete
 
 public interface CompanyRepository extends JpaRepository<Company, Integer> {
-	@Query("SELECT c FROM Company c")
+	@Query("SELECT c FROM Company c JOIN User u on c.user.id = u.id and u.deleted = false ")
 	public Page<Company> findAllItem(Pageable pageable);
 	
 	@Modifying

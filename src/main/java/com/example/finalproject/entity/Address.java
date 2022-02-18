@@ -1,9 +1,15 @@
 package com.example.finalproject.entity;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class Address extends BaseEntity {
@@ -13,7 +19,9 @@ public class Address extends BaseEntity {
 
 	private String city;
 
-	private String district;
+    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL)
+	@JsonManagedReference
+    private List<Recruitment> recruitments;
 
 	public Integer getId() {
 		return id;
@@ -31,12 +39,15 @@ public class Address extends BaseEntity {
 		this.city = city;
 	}
 
-	public String getDistrict() {
-		return district;
+	public List<Recruitment> getRecruitments() {
+		return recruitments;
 	}
 
-	public void setDistrict(String district) {
-		this.district = district;
+	public void setRecruitments(List<Recruitment> recruitments) {
+		this.recruitments = recruitments;
 	}
+	
+	
+
 
 }

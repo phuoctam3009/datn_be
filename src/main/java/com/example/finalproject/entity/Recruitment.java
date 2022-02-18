@@ -70,6 +70,11 @@ public class Recruitment extends BaseEntity {
 
 	private String ads_status;
 
+	@ManyToOne
+	@JoinColumn(name = "address_id")
+	@JsonIgnoreProperties
+	private Address city;
+
 	private boolean isActive;
 
 	public Integer getId() {
@@ -223,7 +228,7 @@ public class Recruitment extends BaseEntity {
 				+ ", jobRequirements=" + jobRequirements + ", jobBenefits=" + jobBenefits + ", salary=" + salary
 				+ ", workExperience=" + workExperience + ", career=" + career + ", level=" + level + ", typeWork="
 				+ typeWork + ", address=" + address + ", resumes=" + resumes + ", status=" + status + ", ads_status="
-				+ ads_status + "]";
+				+ ads_status + ", city=" + city + ", isActive=" + isActive + "]";
 	}
 
 }
