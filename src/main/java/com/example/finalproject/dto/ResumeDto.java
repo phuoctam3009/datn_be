@@ -2,6 +2,8 @@ package com.example.finalproject.dto;
 
 import java.io.File;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class ResumeDto {
 	private String userId;
 
@@ -9,7 +11,7 @@ public class ResumeDto {
 
 	private String title;
 
-	private File file;
+	private String file;
 
 	public String getUserId() {
 		return userId;
@@ -35,11 +37,11 @@ public class ResumeDto {
 		this.title = title;
 	}
 
-	public File getFile() {
+	public String getFile() {
 		return file;
 	}
 
-	public void setFile(File file) {
+	public void setFile(String file) {
 		this.file = file;
 	}
 

@@ -1,20 +1,26 @@
 package com.example.finalproject.api;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.Base64;
 
+import javax.xml.bind.DatatypeConverter;
+
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.example.finalproject.cloudinary.CloudinaryService;
 import com.example.finalproject.dto.ResumeDto;
 import com.example.finalproject.entity.Resume;
 import com.example.finalproject.payload.response.CustomErrorResponse;
@@ -26,15 +32,25 @@ import com.example.finalproject.repository.ResumeRepository;
 public class ResumeController {
 	@Autowired
 	private ResumeRepository resumeRepository;
+	@Autowired
+	private CloudinaryService cloudService;
 
 	@PostMapping("/addResume")
 	@ResponseBody
-	public ResponseEntity addResume(@ModelAttribute ResumeDto data) {
-		System.out.println(data);
+	public ResponseEntity addResume(@ModelAttribute ResumeDto data) throws IOException {
 		Resume resume = new Resume();
+		byte[] decodedBytes = DatatypeConverter.parseBase64Binary(data.getFile().replace("data:image/jpeg;base64,", "").trim());
+//		Base64.getDecoder().decode
+		File file = new File("D:/PhuocTam/file/test.jpeg");
+		FileUtils.writeByteArrayToFile(file, decodedBytes);
+//        File file = new File("D:/PhuocTam/file/test.jpg");
+//        Path write = Files.write(file.toPath(), decode);
+		String uploadFile = cloudService.uploadFile(file);
+		file.delete();
 		resume.setCandidateId(Integer.parseInt(data.getUserId()));
 		resume.setContent(data.getData());
 		resume.setTitle(data.getTitle());
+		resume.setAvatar(uploadFile);
 		Resume save = resumeRepository.save(resume);
 		if (save != null && save.getContent() != null) {
 //		if (!true) {
