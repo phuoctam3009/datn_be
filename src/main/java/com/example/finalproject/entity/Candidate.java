@@ -1,12 +1,15 @@
 package com.example.finalproject.entity;
 
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.SQLDelete;
@@ -39,6 +42,10 @@ public class Candidate extends BaseEntity {
 	private Date birthday;
 
 	private String status;
+	
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL) // Quan hệ 1-n với đối tượng ở dưới (Person) (1 địa điểm có nhiều người ở)
+    // MapopedBy trỏ tới tên biến Address ở trong Person.
+    private List<Resume> resumes;
 
 	private boolean deleted = Boolean.FALSE;
 

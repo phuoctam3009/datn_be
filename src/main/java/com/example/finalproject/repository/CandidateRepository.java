@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.example.finalproject.entity.Candidate;
 
@@ -14,5 +15,8 @@ public interface CandidateRepository extends JpaRepository<Candidate, Integer> {
 	@Override
 	@Query("SELECT c from Candidate c JOIN User u on c.user.id = u.id and u.deleted = false")
 	public Page<Candidate> findAll(Pageable pageable);
+	
+	@Query("SELECT c FROM Candidate c join User u on c.user.id = u.id and u.deleted = false and u.id = ?1")
+	public Candidate findByUserId(Integer userId);
 
 }

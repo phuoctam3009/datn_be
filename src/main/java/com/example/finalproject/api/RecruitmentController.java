@@ -9,11 +9,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +25,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.finalproject.dto.RecruitmentDto;
 import com.example.finalproject.entity.Recruitment;
+import com.example.finalproject.entity.Resume;
+import com.example.finalproject.payload.request.AddResumeDto;
+import com.example.finalproject.payload.response.MessageResponse;
 import com.example.finalproject.repository.RecruitmentRepository;
+import com.example.finalproject.repository.ResumeRepository;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -30,6 +37,8 @@ import com.example.finalproject.repository.RecruitmentRepository;
 public class RecruitmentController {
 	@Autowired
 	private RecruitmentRepository recruitmentRepository;
+	@Autowired
+	private ResumeRepository resumeRepository;
 
 	@GetMapping(path = "/getAll")
 	public ResponseEntity getAllRecruitments(@RequestParam(value = "page", required = true) int page,
@@ -75,6 +84,38 @@ public class RecruitmentController {
 			@RequestParam(value = "id", required = true) int id) {
 		recruitmentRepository.updateStatus(id, status);
 		return ResponseEntity.ok("Update trạng thái thành công");
+
+	}
+
+	@PostMapping("/addResume")
+	@Modifying
+	@Transactional
+	public ResponseEntity addResume(@RequestBody AddResumeDto dto) {
+		Recruitment recruitment = recruitmentRepository.findById(dto.getRecruitmentId()).get();
+		List<Resume> resumes = recruitment.getResumes();
+		if (resumes != null && resumes.size() == 0) {
+			Resume resume = resumeRepository.findById(dto.getResumeId()).get();
+			if (resume != null) {
+				resumes.add(resume);
+				recruitment.setResumes(resumes);
+				recruitmentRepository.save(recruitment);
+				List<Recruitment> recruiments = resume.getRecruiments();
+				recruiments.add(recruitment);
+				resumeRepository.save(resume);
+				return ResponseEntity.ok("Thành công");
+			} else {
+				return ResponseEntity.badRequest().body(new MessageResponse("Không tìm thấy thông tin CV!"));
+			}
+		}
+		// Check CV đã được ứng tuyển
+		boolean anyMatch = resumes.stream().anyMatch(o -> o.getId() == dto.getResumeId());
+		if (anyMatch) {
+			return ResponseEntity.badRequest()
+					.body(new MessageResponse("CV này đã ứng tuyển cho công việc này. Vui lòng không ứng tuyển thêm!"));
+		}
+		resumes.add(resumeRepository.findById(dto.getResumeId()).get());
+		recruitment.setResumes(resumes);
+		return ResponseEntity.ok(recruitmentRepository.save(recruitment));
 
 	}
 

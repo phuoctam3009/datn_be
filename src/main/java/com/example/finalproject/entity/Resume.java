@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Resume extends BaseEntity {
@@ -22,11 +23,13 @@ public class Resume extends BaseEntity {
 
 	private String avatar;
 
-	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinTable(name = "resume_recruitment", joinColumns = @JoinColumn(name = "recruitment_id"), inverseJoinColumns = @JoinColumn(name = "resume_id"))
 	private List<Recruitment> recruiments;
 
-	private Integer candidateId;
+    @ManyToOne
+    @JoinColumn(name = "candidate_id") // thông qua khóa ngoại address_id
+    private Candidate candidate;
 
 	private String content;
 
@@ -62,12 +65,14 @@ public class Resume extends BaseEntity {
 		this.recruiments = recruiments;
 	}
 
-	public Integer getCandidateId() {
-		return candidateId;
+	
+
+	public Candidate getCandidate() {
+		return candidate;
 	}
 
-	public void setCandidateId(Integer candidateId) {
-		this.candidateId = candidateId;
+	public void setCandidate(Candidate candidate) {
+		this.candidate = candidate;
 	}
 
 	public String getContent() {
@@ -81,7 +86,9 @@ public class Resume extends BaseEntity {
 	@Override
 	public String toString() {
 		return "Resume [id=" + id + ", title=" + title + ", avatar=" + avatar + ", recruiments=" + recruiments
-				+ ", candidateId=" + candidateId + "]";
+				+ ", candidate=" + candidate + ", content=" + content + "]";
 	}
+
+	
 
 }
