@@ -12,6 +12,8 @@ public class ResumeDto {
 	private String title;
 
 	private String file;
+	
+	private String path;
 
 	public String getUserId() {
 		return userId;
@@ -44,5 +46,15 @@ public class ResumeDto {
 	public void setFile(String file) {
 		this.file = file;
 	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+	
+	
 
 }

@@ -2,16 +2,18 @@ package com.example.finalproject.api;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,12 +26,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.finalproject.dto.RecruitmentDto;
+import com.example.finalproject.entity.Candidate;
 import com.example.finalproject.entity.Recruitment;
 import com.example.finalproject.entity.Resume;
+import com.example.finalproject.entity.User;
 import com.example.finalproject.payload.request.AddResumeDto;
 import com.example.finalproject.payload.response.MessageResponse;
+import com.example.finalproject.repository.CandidateRepository;
 import com.example.finalproject.repository.RecruitmentRepository;
 import com.example.finalproject.repository.ResumeRepository;
+import com.example.finalproject.repository.UserRepository;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -39,12 +45,14 @@ public class RecruitmentController {
 	private RecruitmentRepository recruitmentRepository;
 	@Autowired
 	private ResumeRepository resumeRepository;
+	@Autowired
+	private CandidateRepository candidateRepository;
+	@Autowired
+	private UserRepository userRepository;
 
 	@GetMapping(path = "/getAll")
 	public ResponseEntity getAllRecruitments(@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "size", required = true) int size) {
-		// This returns a JSON or XML with the users
-//		Page<Recruitment> findAll = recruitmentRepository.findAll(PageRequest.of(page - 1, size));
 		Page<Recruitment> findAll = recruitmentRepository
 				.findAllItem(PageRequest.of(page - 1, size, Sort.by("ads_status").descending()));
 		return ResponseEntity.ok(findAll);
@@ -52,7 +60,6 @@ public class RecruitmentController {
 
 	@GetMapping("/{id}")
 	public Recruitment getRecruitmentById(@PathVariable(name = "id") Integer id) {
-//		recruitmentRepository.
 		Optional<Recruitment> findById = recruitmentRepository.findById(id);
 		Recruitment recruitment = findById.get();
 		return recruitment;
@@ -92,19 +99,22 @@ public class RecruitmentController {
 	@Transactional
 	public ResponseEntity addResume(@RequestBody AddResumeDto dto) {
 		Recruitment recruitment = recruitmentRepository.findById(dto.getRecruitmentId()).get();
-		List<Resume> resumes = recruitment.getResumes();
+		Set<Resume> resumes = recruitment.getResumes();
+		Optional<Resume> findById = resumeRepository.findById(dto.getResumeId());
 		if (resumes != null && resumes.size() == 0) {
-			Resume resume = resumeRepository.findById(dto.getResumeId()).get();
+			Resume resume = findById.get();
 			if (resume != null) {
 				resumes.add(resume);
 				recruitment.setResumes(resumes);
 				recruitmentRepository.save(recruitment);
-				List<Recruitment> recruiments = resume.getRecruiments();
+				Set<Recruitment> recruiments = resume.getRecruitments();
 				recruiments.add(recruitment);
 				resumeRepository.save(resume);
+
 				return ResponseEntity.ok("Thành công");
 			} else {
-				return ResponseEntity.badRequest().body(new MessageResponse("Không tìm thấy thông tin CV!"));
+				return ResponseEntity.badRequest()
+						.body(new MessageResponse("Không tìm thấy thông tin CV! Vui lòng liên hệ với admin"));
 			}
 		}
 		// Check CV đã được ứng tuyển
@@ -113,10 +123,75 @@ public class RecruitmentController {
 			return ResponseEntity.badRequest()
 					.body(new MessageResponse("CV này đã ứng tuyển cho công việc này. Vui lòng không ứng tuyển thêm!"));
 		}
-		resumes.add(resumeRepository.findById(dto.getResumeId()).get());
+		resumes.add(findById.get());
 		recruitment.setResumes(resumes);
 		return ResponseEntity.ok(recruitmentRepository.save(recruitment));
 
+	}
+
+	@GetMapping("/checkApply/{id}")
+	public ResponseEntity checkCandidateIsApplied(@PathVariable(name = "id") Integer id, HttpServletRequest request) {
+		Recruitment recruitment = recruitmentRepository.findById(id).get();
+		if (id == null || recruitment == null) {
+			return ResponseEntity.badRequest().body(new MessageResponse("Không tìm thấy thông tin công việc!"));
+		}
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String username = userDetails.getUsername();
+		User user = userRepository.findByUsername(username).get();
+		Candidate findByUserId = candidateRepository.findByUserId(user.getId());
+		Set<Resume> resumes = recruitment.getResumes();
+		if (resumes.size() == 0) {
+			return ResponseEntity.ok(false);
+		}
+		boolean anyMatch = resumes.stream().anyMatch(o -> o.getCandidate().getId() == findByUserId.getId());
+		if (anyMatch) {
+			return ResponseEntity.ok(true);
+		}
+		return ResponseEntity.ok(false);
+	}
+
+	@GetMapping("/applied")
+	public ResponseEntity getRecruitmentApplied(@RequestParam(value = "page", required = false) Integer page,
+			@RequestParam(value = "size", required = false) Integer size) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String username = userDetails.getUsername();
+		User user = userRepository.findByUsername(username).get();
+		Candidate findByUserId = candidateRepository.findByUserId(user.getId());
+		Page<RecruitmentDto> recruitmentApplied = recruitmentRepository.getRecruitmentApplied(findByUserId.getId(),
+				PageRequest.of(page - 1, size));
+		return ResponseEntity.ok(recruitmentApplied);
+	}
+
+	@PutMapping("/cancelResume/{recruitmentId}")
+	@Modifying
+	@Transactional
+	public ResponseEntity cancelResume(@PathVariable("recruitmentId") Integer recruitmentId) {
+//		if (recruitmentId == null) {
+//			return ResponseEntity.badRequest()
+//					.body(new MessageResponse("Không tìm thấy thông tin! Vui lòng liên hệ với admin"));
+//		}
+//		Recruitment recruitment = recruitmentRepository.findById(recruitmentId).get();
+//		if (recruitment == null) {
+//			return ResponseEntity.badRequest()
+//					.body(new MessageResponse("Không tìm thấy thông tin! Vui lòng liên hệ với admin"));
+//		}
+//		Set<Resume> resumes = recruitment.getResumes();
+//		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//		String username = userDetails.getUsername();
+//		User user = userRepository.findByUsername(username).get();
+//		Resume resume = resumes.stream().filter(p -> p.getCandidate().getUser().getId() == user.getId()).findFirst()
+//				.get();
+//		if (resume != null) {
+//			resumes.remove(resume);
+//		}
+//		recruitment.setResumes(resumes);
+//		recruitmentRepository.save(recruitment);
+//		Set<Recruitment> recruitments = resume.getRecruitments();
+//		Recruitment recruitment2 = recruitments.stream().filter(item -> item.getId() == recruitment.getId()).findFirst().get();
+//		recruitments.remove(recruitment2);
+//		resume.setRecruitments(recruitments);
+//		resumeRepository.save(resume);
+		return ResponseEntity.ok("Hủy ứng tuyển thành công!");
 	}
 
 }

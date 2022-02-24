@@ -1,6 +1,6 @@
 package com.example.finalproject.entity;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -13,7 +13,12 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 @Entity
+@SQLDelete(sql = "UPDATE Resume SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
 public class Resume extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,15 +28,19 @@ public class Resume extends BaseEntity {
 
 	private String avatar;
 
-	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinTable(name = "resume_recruitment", joinColumns = @JoinColumn(name = "recruitment_id"), inverseJoinColumns = @JoinColumn(name = "resume_id"))
-	private List<Recruitment> recruiments;
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinTable(name = "resume_recruitment", joinColumns = @JoinColumn(name = "resume_id"), inverseJoinColumns = @JoinColumn(name = "recruitment_id"))
+	private Set<Recruitment> recruitments;
 
-    @ManyToOne
-    @JoinColumn(name = "candidate_id") // thông qua khóa ngoại address_id
-    private Candidate candidate;
+	@ManyToOne
+	@JoinColumn(name = "candidate_id") // thông qua khóa ngoại address_id
+	private Candidate candidate;
 
 	private String content;
+
+	private boolean deleted = Boolean.FALSE;
+	
+	private String path;
 
 	public Integer getId() {
 		return id;
@@ -57,15 +66,13 @@ public class Resume extends BaseEntity {
 		this.avatar = avatar;
 	}
 
-	public List<Recruitment> getRecruiments() {
-		return recruiments;
+	public Set<Recruitment> getRecruitments() {
+		return recruitments;
 	}
 
-	public void setRecruiments(List<Recruitment> recruiments) {
-		this.recruiments = recruiments;
+	public void setRecruitments(Set<Recruitment> recruitments) {
+		this.recruitments = recruitments;
 	}
-
-	
 
 	public Candidate getCandidate() {
 		return candidate;
@@ -83,12 +90,26 @@ public class Resume extends BaseEntity {
 		this.content = content;
 	}
 
-	@Override
-	public String toString() {
-		return "Resume [id=" + id + ", title=" + title + ", avatar=" + avatar + ", recruiments=" + recruiments
-				+ ", candidate=" + candidate + ", content=" + content + "]";
+	public boolean isDeleted() {
+		return deleted;
 	}
 
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
 	
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	@Override
+	public String toString() {
+		return "Resume [id=" + id + ", title=" + title + ", avatar=" + avatar + ", recruitments=" + recruitments
+				+ ", candidate=" + candidate + ", content=" + content + "]";
+	}
 
 }

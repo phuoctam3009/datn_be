@@ -1,7 +1,7 @@
 package com.example.finalproject.entity;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,7 +14,6 @@ import javax.persistence.ManyToOne;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class Recruitment extends BaseEntity {
@@ -63,9 +62,9 @@ public class Recruitment extends BaseEntity {
 
 	private String address;
 
-	@ManyToMany(mappedBy = "recruiments")
+	@ManyToMany(mappedBy = "recruitments")
 	@JsonIgnore
-	private List<Resume> resumes;
+	private Set<Resume> resumes;
 
 	private String status;
 
@@ -182,11 +181,13 @@ public class Recruitment extends BaseEntity {
 		this.address = address;
 	}
 
-	public List<Resume> getResumes() {
+	
+
+	public Set<Resume> getResumes() {
 		return resumes;
 	}
 
-	public void setResumes(List<Resume> resumes) {
+	public void setResumes(Set<Resume> resumes) {
 		this.resumes = resumes;
 	}
 

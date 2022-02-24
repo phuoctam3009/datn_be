@@ -36,4 +36,17 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
 	@Transactional
 	@Query("UPDATE Recruitment m SET m.isActive = ?2 WHERE m.id = ?1")
 	public int updateStatus(Integer recruitmentId, boolean active);
+
+	@Query(value = "Select r.id, r.job_title as jobTitle, r.salary as salary, r.address as address, ca.name_career as career, "
+			+ "datediff(r.date_recruitment, now()) as dateDiff, c.avatar as avatarCom, c.id as companyId, c.company_name as companyName, r.id as resumeId "
+			+ "FROM Recruitment r " + "join Career ca on r.career_id = ca.id "
+			+ "join Company c on r.company_id = c.id " + "join resume_recruitment rr on r.id = rr.recruitment_id "
+			+ "join resume re on rr.resume_id = re.id "
+			+ "where re.candidate_id = ?1", 
+			countQuery = "Select count(r.id) from recruitment r "
+					+ "join Career ca on r.career_id = ca.id " + "join Company c on r.company_id = c.id "
+					+ "join resume_recruitment rr on r.id = rr.recruitment_id "
+					+ "join resume re on rr.resume_id = re.id " + "where re.candidate_id = ?1", nativeQuery = true)
+	public Page<RecruitmentDto> getRecruitmentApplied(Integer candidateId, Pageable pageable);
+
 }

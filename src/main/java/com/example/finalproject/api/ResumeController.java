@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,7 @@ import com.example.finalproject.entity.Candidate;
 import com.example.finalproject.entity.Company;
 import com.example.finalproject.entity.Resume;
 import com.example.finalproject.payload.response.CustomErrorResponse;
+import com.example.finalproject.payload.response.MessageResponse;
 import com.example.finalproject.repository.CandidateRepository;
 import com.example.finalproject.repository.ResumeRepository;
 
@@ -58,6 +60,7 @@ public class ResumeController {
 		resume.setContent(data.getData());
 		resume.setTitle(data.getTitle());
 		resume.setAvatar(uploadFile);
+		
 		Resume save = resumeRepository.save(resume);
 		if (save != null && save.getContent() != null) {
 //		if (!true) {
@@ -81,5 +84,11 @@ public class ResumeController {
 	public Resume getResumeById(@PathVariable(name = "id") Integer id) {
 		Resume resume = resumeRepository.findById(id).get();
 		return resume;
+	}
+	
+	@DeleteMapping(path = "/delete/{id}")
+	public ResponseEntity deleleResume(@PathVariable("id") Integer id) {
+		resumeRepository.deleteById(id);
+		return ResponseEntity.ok("Xóa CV thành công!");
 	}
 }
