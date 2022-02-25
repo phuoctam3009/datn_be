@@ -30,6 +30,7 @@ import com.example.finalproject.payload.response.CustomErrorResponse;
 import com.example.finalproject.payload.response.MessageResponse;
 import com.example.finalproject.repository.CandidateRepository;
 import com.example.finalproject.repository.ResumeRepository;
+import com.example.finalproject.service.UploadFileService;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
@@ -41,6 +42,8 @@ public class ResumeController {
 	private CandidateRepository canditeRepository;
 	@Autowired
 	private CloudinaryService cloudService;
+	@Autowired
+	private UploadFileService uploadFileService;
 
 	@PostMapping("/addResume")
 	@ResponseBody
@@ -60,6 +63,8 @@ public class ResumeController {
 		resume.setContent(data.getData());
 		resume.setTitle(data.getTitle());
 		resume.setAvatar(uploadFile);
+		String uploadingFile = uploadFileService.uploadingFile(data.getPath());
+		resume.setPath(uploadingFile);
 		
 		Resume save = resumeRepository.save(resume);
 		if (save != null && save.getContent() != null) {

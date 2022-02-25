@@ -13,7 +13,7 @@ public class ResumeDto {
 
 	private String file;
 	
-	private String path;
+	private MultipartFile path;
 
 	public String getUserId() {
 		return userId;
@@ -47,14 +47,14 @@ public class ResumeDto {
 		this.file = file;
 	}
 
-	public String getPath() {
+	public MultipartFile getPath() {
 		return path;
 	}
 
-	public void setPath(String path) {
+	public void setPath(MultipartFile path) {
 		this.path = path;
 	}
-	
-	
+
+
 
 }
