@@ -29,6 +29,10 @@ public interface RecruitmentDto {
 	
 	Integer getResumeId();
 	
+	Integer getAmountEmployee();
+	
+	Boolean getIsActive();
+	
 	
 
 }

@@ -25,6 +25,19 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
 			+ "where r.company_id = :companyId and r.id != :recruitmentId and datediff(r.date_recruitment, now()) > 0 limit 3", nativeQuery = true)
 	public List<RecruitmentDto> getRecruitmentReferenceByCompanyId(@Param("companyId") Integer companyId,
 			@Param("recruitmentId") Integer recruitmentId);
+	
+	@Query(value = "SELECT r.id, c.avatar as avatarCom, r.salary, r.amount_employee as amountEmployee, r.address, r.is_active as isActive, r.job_title as jobTitle, datediff(r.date_recruitment, now()) as dateDiff, l.name_level as nameLevel, tw.name_type_work as nameTypeWork "
+			+ "FROM Recruitment r "
+			+ "join level l "
+			+ "on r.level_id = l.id "
+			+ "join type_work tw "
+			+ "on r.type_work_id = tw.id "
+			+ "join Company c "
+			+ "on r.company_id = c.id "
+			+ "where c.user_id = ?1 and r.deleted = false", 
+			countQuery = "select r.id from Recruitment r join Company c on r.company_id = c.id where c.user_id = ?1",
+			nativeQuery = true)
+	public Page<RecruitmentDto> getRecruitmentsByEmployerId(Integer userId, Pageable pageable);
 
 	@Query(value = "Select  r.id, r.job_title as jobTitle, datediff(r.date_recruitment, now()) as dateDiff, l.name_level as nameLevel, tw.name_type_work as nameTypeWork, c.avatar as avatarCom, c.id as companyId "
 			+ "FROM Recruitment r " + "join level l " + "on r.level_id = l.id " + "join type_work tw "

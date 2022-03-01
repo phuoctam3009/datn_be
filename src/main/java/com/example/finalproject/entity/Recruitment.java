@@ -11,11 +11,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
+@SQLDelete(sql = "UPDATE Recruitment SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
 public class Recruitment extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -77,6 +83,8 @@ public class Recruitment extends BaseEntity {
 
 	private boolean isActive;
 
+	private boolean deleted = Boolean.FALSE;
+
 	public Integer getId() {
 		return id;
 	}
@@ -109,6 +117,7 @@ public class Recruitment extends BaseEntity {
 		this.amountEmployee = amountEmployee;
 	}
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	public Date getDateRecruitment() {
 		return dateRecruitment;
 	}
@@ -181,8 +190,6 @@ public class Recruitment extends BaseEntity {
 		this.address = address;
 	}
 
-	
-
 	public Set<Resume> getResumes() {
 		return resumes;
 	}
@@ -221,6 +228,14 @@ public class Recruitment extends BaseEntity {
 
 	public void setActive(boolean isActive) {
 		this.isActive = isActive;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	@Override

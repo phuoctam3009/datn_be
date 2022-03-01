@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -192,6 +193,23 @@ public class RecruitmentController {
 //		resume.setRecruitments(recruitments);
 //		resumeRepository.save(resume);
 		return ResponseEntity.ok("Hủy ứng tuyển thành công!");
+	}
+
+	@GetMapping("/reference")
+	public ResponseEntity getRecruitmentByEmployerId(@RequestParam(value = "page", required = false) Integer page,
+			@RequestParam(value = "size", required = false) Integer size) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String username = userDetails.getUsername();
+		User user = userRepository.findByUsername(username).get();
+		Page<RecruitmentDto> recruitmentsByEmployerId = recruitmentRepository.getRecruitmentsByEmployerId(user.getId(), PageRequest.of(page - 1, size));
+		return ResponseEntity.ok(recruitmentsByEmployerId);
+	}
+	
+	@DeleteMapping(path = "/delete/{id}")
+	public ResponseEntity deleteRecruitment(@PathVariable("id") Integer id) {
+		recruitmentRepository.deleteById(id);
+		return ResponseEntity.ok("Xóa thông tin tuyển dụng thành công!");
+
 	}
 
 }
