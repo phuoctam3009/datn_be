@@ -1,5 +1,6 @@
 package com.example.finalproject.api;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -28,14 +29,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.finalproject.dto.RecruitmentDto;
 import com.example.finalproject.entity.Candidate;
+import com.example.finalproject.entity.Company;
 import com.example.finalproject.entity.Recruitment;
 import com.example.finalproject.entity.Resume;
 import com.example.finalproject.entity.User;
 import com.example.finalproject.payload.request.AddResumeDto;
+import com.example.finalproject.payload.request.RecruitmentRequest;
 import com.example.finalproject.payload.response.MessageResponse;
 import com.example.finalproject.repository.CandidateRepository;
+import com.example.finalproject.repository.CareerRepository;
+import com.example.finalproject.repository.CityRepository;
+import com.example.finalproject.repository.CompanyRepository;
+import com.example.finalproject.repository.LevelRepository;
 import com.example.finalproject.repository.RecruitmentRepository;
 import com.example.finalproject.repository.ResumeRepository;
+import com.example.finalproject.repository.TypeWorkRepository;
 import com.example.finalproject.repository.UserRepository;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -50,7 +58,17 @@ public class RecruitmentController {
 	private CandidateRepository candidateRepository;
 	@Autowired
 	private UserRepository userRepository;
-
+	@Autowired
+	private CareerRepository careerRepository;
+	@Autowired
+	private LevelRepository levelRepository;
+	@Autowired
+	private TypeWorkRepository typeWorkRepository;
+	@Autowired
+	private CompanyRepository companyRepository;
+	@Autowired
+	private CityRepository cityRepository;
+	
 	@GetMapping(path = "/getAll")
 	public ResponseEntity getAllRecruitments(@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "size", required = true) int size) {
@@ -210,6 +228,56 @@ public class RecruitmentController {
 		recruitmentRepository.deleteById(id);
 		return ResponseEntity.ok("Xóa thông tin tuyển dụng thành công!");
 
+	}
+	
+	@PutMapping("/employer/updateInfo")
+	public ResponseEntity employerUpdateInfo(@RequestBody RecruitmentRequest payload) {
+		Recruitment recruitment = recruitmentRepository.findById(payload.getId()).get();
+		recruitment.setAddress(payload.getAddress());
+		recruitment.setDateRecruitment(payload.getDateRecruitment());
+		recruitment.setJobBenefits(payload.getJobBenefits());
+		recruitment.setJobDescription(payload.getJobDescription());
+		recruitment.setJobRequirements(payload.getJobRequirements());
+		recruitment.setJobTitle(payload.getJobTitle());
+		recruitment.setSalary(payload.getSalary());
+		recruitment.setWorkExperience(payload.getWorkExperience());
+		recruitment.setAmountEmployee(payload.getAmountEmployee());
+		recruitment.setCareer(careerRepository.findById(payload.getCareerId()).get());
+		recruitment.setLevel(levelRepository.findById(payload.getLevelId()).get());
+		recruitment.setTypeWork(typeWorkRepository.findById(payload.getTypeWorkId()).get());
+		recruitment.setCity(cityRepository.findById(payload.getCityId()).get());
+		recruitment.setUpdateTime(new Date());
+		Recruitment save = recruitmentRepository.save(recruitment);
+		return ResponseEntity.ok("Update thông tin tuyển dụng thành công!"); 
+	}
+	
+	@PostMapping("/employer/add")
+	public ResponseEntity addNewRecruitment(@RequestBody RecruitmentRequest payload) {
+		Recruitment recruitment = new Recruitment();
+		recruitment.setAddress(payload.getAddress());
+		recruitment.setDateRecruitment(payload.getDateRecruitment());
+		recruitment.setJobBenefits(payload.getJobBenefits());
+		recruitment.setJobDescription(payload.getJobDescription());
+		recruitment.setJobRequirements(payload.getJobRequirements());
+		recruitment.setJobTitle(payload.getJobTitle());
+		recruitment.setSalary(payload.getSalary());
+		recruitment.setWorkExperience(payload.getWorkExperience());
+		recruitment.setAmountEmployee(payload.getAmountEmployee());
+		recruitment.setCareer(careerRepository.findById(payload.getCareerId()).get());
+		recruitment.setLevel(levelRepository.findById(payload.getLevelId()).get());
+		recruitment.setTypeWork(typeWorkRepository.findById(payload.getTypeWorkId()).get());
+		recruitment.setCreateTime(new Date());
+		recruitment.setCity(cityRepository.findById(payload.getCityId()).get());
+		Company company = companyRepository.getCompanyByUserId(payload.getUserId());
+		recruitment.setCompany(company);
+		recruitmentRepository.save(recruitment);
+		return ResponseEntity.ok("Thêm mới thông tin tuyển dụng thành công!");
+	}
+	
+	@GetMapping("/{id}/resumes")
+	public ResponseEntity getResumesByRecruitmentId(@PathVariable("id") Integer id) {
+		List<Resume> resumes = resumeRepository.getResumesByRecruitmentId(id);
+		return ResponseEntity.ok(resumes);
 	}
 
 }

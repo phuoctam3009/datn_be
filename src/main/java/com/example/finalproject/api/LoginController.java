@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.finalproject.entity.Candidate;
+import com.example.finalproject.entity.Company;
 import com.example.finalproject.entity.ERole;
 import com.example.finalproject.entity.Role;
 import com.example.finalproject.entity.User;
@@ -29,6 +31,9 @@ import com.example.finalproject.payload.response.JwtResponse;
 import com.example.finalproject.payload.response.MessageResponse;
 import com.example.finalproject.repository.RoleRepository;
 import com.example.finalproject.repository.UserRepository;
+import com.example.finalproject.repository.CandidateRepository;
+import com.example.finalproject.repository.CompanyRepository;
+
 import com.example.finalproject.security.jwt.JwtUtils;
 import com.example.finalproject.security.services.UserDetailsImpl;
 
@@ -40,6 +45,10 @@ public class LoginController {
 	AuthenticationManager authenticationManager;
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private CandidateRepository candidateRepository;
+	@Autowired
+	private CompanyRepository companyRepository;
 	@Autowired
 	private RoleRepository roleRepository;
 	@Autowired
@@ -116,7 +125,20 @@ public class LoginController {
 //			});
 		}
 		user.setRoles(roles);
-		userRepository.save(user);
+
+		User userSaved = userRepository.save(user);
+		for (Role role : roles) {
+			if (role.getRoleName().name().equalsIgnoreCase("ROLE_CANDIDATE")) {
+				Candidate candidate = new Candidate();
+				candidate.setUser(userSaved);
+				candidateRepository.save(candidate);
+			} else if (role.getRoleName().name().equalsIgnoreCase("ROLE_EMPLOYEE")) {
+				Company company = new Company();
+				company.setUser(userSaved);
+				companyRepository.save(company);
+			}
+		}
+
 		return ResponseEntity.ok(new MessageResponse("Đăng ký tài khoản thành công!"));
 	}
 }

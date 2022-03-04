@@ -31,7 +31,7 @@ public class Recruitment extends BaseEntity {
 	@JoinColumn(name = "company_id")
 //	@JsonBackReference
 	@JsonIgnoreProperties("recruitments")
-	private Company company;
+	private Company company; 
 
 	private String jobTitle;
 
@@ -51,7 +51,9 @@ public class Recruitment extends BaseEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "career_id")
-	@JsonBackReference
+//	@JsonBackReference
+	@JsonIgnoreProperties("recruitments")
+
 	private Career career;
 
 	@ManyToOne
@@ -74,14 +76,14 @@ public class Recruitment extends BaseEntity {
 
 	private String status;
 
-	private String ads_status;
+	private String ads_status; 
 
 	@ManyToOne
-	@JoinColumn(name = "address_id")
-	@JsonIgnoreProperties
-	private Address city;
+	@JoinColumn(name = "city_id")
+	@JsonIgnoreProperties("recruitments")
+	private City city; 
 
-	private boolean isActive;
+	private boolean isActive = Boolean.FALSE;
 
 	private boolean deleted = Boolean.FALSE;
 
@@ -117,7 +119,6 @@ public class Recruitment extends BaseEntity {
 		this.amountEmployee = amountEmployee;
 	}
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	public Date getDateRecruitment() {
 		return dateRecruitment;
 	}
@@ -236,6 +237,14 @@ public class Recruitment extends BaseEntity {
 
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public City getCity() {
+		return city;
+	}
+
+	public void setCity(City city) {
+		this.city = city;
 	}
 
 	@Override

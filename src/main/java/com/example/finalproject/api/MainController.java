@@ -25,12 +25,12 @@ public class MainController {
 
 		User n = new User();
 		userRepository.save(n);
-		return "Saved";
+		return "Saved"; 
 	}
 
 	@GetMapping(path = "/all")
 	public Iterable<User> getAllUsers() {
 		// This returns a JSON or XML with the users
-		return userRepository.findAll();
+		return userRepository.findAll(); 
 	}
 }

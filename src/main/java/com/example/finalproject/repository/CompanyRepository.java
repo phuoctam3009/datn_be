@@ -17,10 +17,15 @@ import com.example.finalproject.entity.Recruitment;
 public interface CompanyRepository extends JpaRepository<Company, Integer> {
 	@Query("SELECT c FROM Company c JOIN User u on c.user.id = u.id and u.deleted = false ")
 	public Page<Company> findAllItem(Pageable pageable);
+	@Query("SELECT c FROM Company c JOIN User u on c.user.id = u.id and u.deleted = false and c.isActive = true")
+	public Page<Company> findAllItemActive(Pageable pageable);
 	
 	@Modifying
 	@Transactional
 	@Query("UPDATE Company c SET c.isActive = ?2 WHERE c.id = ?1")
 	public int updateStatus(Integer recruitmentId, boolean active);
+	
+	@Query("SELECT c FROM Company c where c.user.id = ?1")
+	public Company getCompanyByUserId(Integer userId);
 
 }

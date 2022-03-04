@@ -33,7 +33,7 @@ public class Resume extends BaseEntity {
 	private Set<Recruitment> recruitments;
 
 	@ManyToOne
-	@JoinColumn(name = "candidate_id") // thông qua khóa ngoại address_id
+	@JoinColumn(name = "candidate_id")
 	private Candidate candidate;
 
 	private String content;

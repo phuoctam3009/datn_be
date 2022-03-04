@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
@@ -21,6 +22,7 @@ public class Career extends BaseEntity{
 	
 	@OneToMany(mappedBy = "career", cascade = CascadeType.ALL)
 	@JsonManagedReference
+//	@JsonIgnoreProperties("career")
 	private List<Recruitment> recruitments;
 
 	public Integer getId() {
