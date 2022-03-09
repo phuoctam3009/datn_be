@@ -32,16 +32,6 @@ public class CloudinaryService {
 		this.cloudinary = new Cloudinary(config);
 	}
 
-//	public String uploadFile(MultipartFile file) {
-//		try {
-//			File uploadedFile = convertMultiPartToFile(file);
-//			Map uploadResult = cloudinary.uploader().upload(uploadedFile, ObjectUtils.emptyMap());
-//			return uploadResult.get("url").toString();
-//		} catch (Exception e) {
-//			throw new RuntimeException(e);
-//		}
-//	}
-
 	public String uploadFile(Object file) {
 		try {
 			Map uploadResult = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());

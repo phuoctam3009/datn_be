@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -68,13 +69,27 @@ public class RecruitmentController {
 	private CompanyRepository companyRepository;
 	@Autowired
 	private CityRepository cityRepository;
-	
+
 	@GetMapping(path = "/getAll")
 	public ResponseEntity getAllRecruitments(@RequestParam(value = "page", required = true) int page,
 			@RequestParam(value = "size", required = true) int size) {
 		Page<Recruitment> findAll = recruitmentRepository
 				.findAllItem(PageRequest.of(page - 1, size, Sort.by("ads_status").descending()));
 		return ResponseEntity.ok(findAll);
+	}
+
+	@GetMapping(path = "/query")
+	public ResponseEntity getQueryRecruitment(@RequestParam(value = "page", required = true) int page,
+			@RequestParam(value = "size", required = true) int size,
+			@RequestParam(value = "textQuery", required = true) String query) {
+		if (StringUtils.isEmpty(query)) {
+			Page<Recruitment> findAll = recruitmentRepository.findAllItem(PageRequest.of(page - 1, size));
+			return ResponseEntity.ok(findAll);
+		} else {
+			Page<Recruitment> queryRecruitment = recruitmentRepository.queryRecruitment(query,
+					PageRequest.of(page - 1, size));
+			return ResponseEntity.ok(queryRecruitment);
+		}
 	}
 
 	@GetMapping("/{id}")
@@ -219,17 +234,18 @@ public class RecruitmentController {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String username = userDetails.getUsername();
 		User user = userRepository.findByUsername(username).get();
-		Page<RecruitmentDto> recruitmentsByEmployerId = recruitmentRepository.getRecruitmentsByEmployerId(user.getId(), PageRequest.of(page - 1, size));
+		Page<RecruitmentDto> recruitmentsByEmployerId = recruitmentRepository.getRecruitmentsByEmployerId(user.getId(),
+				PageRequest.of(page - 1, size));
 		return ResponseEntity.ok(recruitmentsByEmployerId);
 	}
-	
+
 	@DeleteMapping(path = "/delete/{id}")
 	public ResponseEntity deleteRecruitment(@PathVariable("id") Integer id) {
 		recruitmentRepository.deleteById(id);
 		return ResponseEntity.ok("Xóa thông tin tuyển dụng thành công!");
 
 	}
-	
+
 	@PutMapping("/employer/updateInfo")
 	public ResponseEntity employerUpdateInfo(@RequestBody RecruitmentRequest payload) {
 		Recruitment recruitment = recruitmentRepository.findById(payload.getId()).get();
@@ -248,9 +264,9 @@ public class RecruitmentController {
 		recruitment.setCity(cityRepository.findById(payload.getCityId()).get());
 		recruitment.setUpdateTime(new Date());
 		Recruitment save = recruitmentRepository.save(recruitment);
-		return ResponseEntity.ok("Update thông tin tuyển dụng thành công!"); 
+		return ResponseEntity.ok("Update thông tin tuyển dụng thành công!");
 	}
-	
+
 	@PostMapping("/employer/add")
 	public ResponseEntity addNewRecruitment(@RequestBody RecruitmentRequest payload) {
 		Recruitment recruitment = new Recruitment();
@@ -273,7 +289,7 @@ public class RecruitmentController {
 		recruitmentRepository.save(recruitment);
 		return ResponseEntity.ok("Thêm mới thông tin tuyển dụng thành công!");
 	}
-	
+
 	@GetMapping("/{id}/resumes")
 	public ResponseEntity getResumesByRecruitmentId(@PathVariable("id") Integer id) {
 		List<Resume> resumes = resumeRepository.getResumesByRecruitmentId(id);

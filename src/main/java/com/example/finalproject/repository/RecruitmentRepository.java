@@ -19,24 +19,53 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
 	@Query("SELECT r FROM Recruitment r")
 	public Page<Recruitment> findAllItem(Pageable pageable);
 
+	@Query(value = "SELECT * from Recruitment r " + "join City c on r.city_id = c.id "
+			+ "join Career ca on r.career_id = ca.id " + "join Company com on r.company_id = com.id "
+			+ "join Level l on r.level_id = l.id " + "join type_work tw on r.type_work_id = tw.id "
+			+ "where r.is_active = true and ( " + "(?1 is null or lower(r.address) like lower(concat('%', ?1, '%'))) "
+			+ "or (?1 is null or r.amount_employee = ?1) "
+			+ "or (?1 is null or lower(r.job_benefits) like lower(concat('%', ?1, '%'))) "
+			+ "or (?1 is null or lower(r.job_description) like lower(concat('%', ?1, '%'))) "
+			+ "or (?1 is null or lower(r.job_requirements) like lower(concat('%', ?1, '%'))) "
+			+ "or (?1 is null or lower(r.job_title) like lower(concat('%', ?1, '%'))) "
+			+ "or (?1 is null or lower(r.salary) like lower(concat('%', ?1, '%'))) "
+			+ "or (?1 is null or lower(r.work_experience) like lower(concat('%', ?1, '%'))) "
+			+ "or (?1 is null or lower(c.city_name) like lower(concat('%', ?1, '%'))) "
+			+ "or (?1 is null or lower(ca.name_career) like lower(concat('%', ?1, '%'))) "
+			+ "or (?1 is null or lower(com.company_name) like lower(concat('%', ?1, '%'))) "
+			+ "or (?1 is null or lower(l.name_level) like lower(concat('%', ?1, '%'))) "
+			+ "or (?1 is null or lower(tw.name_type_work) like lower(concat('%', ?1, '%'))) "
+			+ ") ", countQuery = "SELECT count(*) from Recruitment r " + "join City c on r.city_id = c.id "
+					+ "join Career ca on r.career_id = ca.id " + "join Company com on r.company_id = com.id "
+					+ "join Level l on r.level_id = l.id " + "join type_work tw on r.type_work_id = tw.id "
+					+ "where r.is_active = true and ( "
+					+ "(?1 is null or lower(r.address) like lower(concat('%', ?1, '%'))) "
+					+ "or (?1 is null or r.amount_employee = ?1) "
+					+ "or (?1 is null or lower(r.job_benefits) like lower(concat('%', ?1, '%'))) "
+					+ "or (?1 is null or lower(r.job_description) like lower(concat('%', ?1, '%'))) "
+					+ "or (?1 is null or lower(r.job_requirements) like lower(concat('%', ?1, '%'))) "
+					+ "or (?1 is null or lower(r.job_title) like lower(concat('%', ?1, '%'))) "
+					+ "or (?1 is null or lower(r.salary) like lower(concat('%', ?1, '%'))) "
+					+ "or (?1 is null or lower(r.work_experience) like lower(concat('%', ?1, '%'))) "
+					+ "or (?1 is null or lower(c.city_name) like lower(concat('%', ?1, '%'))) "
+					+ "or (?1 is null or lower(ca.name_career) like lower(concat('%', ?1, '%'))) "
+					+ "or (?1 is null or lower(com.company_name) like lower(concat('%', ?1, '%'))) "
+					+ "or (?1 is null or lower(l.name_level) like lower(concat('%', ?1, '%'))) "
+					+ "or (?1 is null or lower(tw.name_type_work) like lower(concat('%', ?1, '%'))) "
+					+ ") ", nativeQuery = true)
+	public Page<Recruitment> queryRecruitment(String query, Pageable pageable);
+
 	@Query(value = "SELECT r.id, r.job_title as jobTitle, datediff(r.date_recruitment, now()) as dateDiff, l.name_level as nameLevel, tw.name_type_work as nameTypeWork "
 			+ "FROM Recruitment r " + "join level l " + "on r.level_id = l.id " + "join type_work tw "
 			+ "on r.type_work_id = tw.id "
 			+ "where r.company_id = :companyId and r.id != :recruitmentId and datediff(r.date_recruitment, now()) > 0 limit 3", nativeQuery = true)
 	public List<RecruitmentDto> getRecruitmentReferenceByCompanyId(@Param("companyId") Integer companyId,
 			@Param("recruitmentId") Integer recruitmentId);
-	
+
 	@Query(value = "SELECT r.id, c.avatar as avatarCom, r.salary, r.amount_employee as amountEmployee, r.address, r.is_active as isActive, r.job_title as jobTitle, datediff(r.date_recruitment, now()) as dateDiff, l.name_level as nameLevel, tw.name_type_work as nameTypeWork "
-			+ "FROM Recruitment r "
-			+ "join level l "
-			+ "on r.level_id = l.id "
-			+ "join type_work tw "
-			+ "on r.type_work_id = tw.id "
-			+ "join Company c "
-			+ "on r.company_id = c.id "
-			+ "where c.user_id = ?1 and r.deleted = false", 
-			countQuery = "select r.id from Recruitment r join Company c on r.company_id = c.id where c.user_id = ?1",
-			nativeQuery = true)
+			+ "FROM Recruitment r " + "join level l " + "on r.level_id = l.id " + "join type_work tw "
+			+ "on r.type_work_id = tw.id " + "join Company c " + "on r.company_id = c.id "
+			+ "where c.user_id = ?1 and r.deleted = false", countQuery = "select r.id from Recruitment r join Company c on r.company_id = c.id where c.user_id = ?1", nativeQuery = true)
 	public Page<RecruitmentDto> getRecruitmentsByEmployerId(Integer userId, Pageable pageable);
 
 	@Query(value = "Select  r.id, r.job_title as jobTitle, datediff(r.date_recruitment, now()) as dateDiff, l.name_level as nameLevel, tw.name_type_work as nameTypeWork, c.avatar as avatarCom, c.id as companyId "
@@ -55,8 +84,7 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Intege
 			+ "FROM Recruitment r " + "join Career ca on r.career_id = ca.id "
 			+ "join Company c on r.company_id = c.id " + "join resume_recruitment rr on r.id = rr.recruitment_id "
 			+ "join resume re on rr.resume_id = re.id "
-			+ "where re.candidate_id = ?1", 
-			countQuery = "Select count(r.id) from recruitment r "
+			+ "where re.candidate_id = ?1", countQuery = "Select count(r.id) from recruitment r "
 					+ "join Career ca on r.career_id = ca.id " + "join Company c on r.company_id = c.id "
 					+ "join resume_recruitment rr on r.id = rr.recruitment_id "
 					+ "join resume re on rr.resume_id = re.id " + "where re.candidate_id = ?1", nativeQuery = true)
